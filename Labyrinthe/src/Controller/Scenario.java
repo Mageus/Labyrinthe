@@ -23,6 +23,9 @@ public class Scenario
 	public static int tresor_x;
 	public static int tresor_y;
 	
+	public static PieceS p1;
+	public static PieceS p2;
+	
 	public static Piece[][] pieces;			//Piece[Ordonnée][Abscisse]
 	
 	public static Cloison[][] cloisonsV;		//Cloison[Ordonnée][Abscisse] -> cloisons verticales
@@ -57,7 +60,7 @@ public class Scenario
 		do{
 			spawn_x = (int)(Math.random()*pieces[0].length);
 			spawn_y = (int)(Math.random()*pieces.length);
-		}while(spawn_x==tresor_x && spawn_y==tresor_y);
+		}while(spawn_x==tresor_x && spawn_y==tresor_y || distanceTrajetCourt(spawn_x, spawn_y, tresor_x, tresor_y)<5);
 		joueur.x=spawn_x;
 		joueur.y=spawn_y;
 		pieces[spawn_y][spawn_x].joueur=joueur;
@@ -67,6 +70,49 @@ public class Scenario
 		
 		String criticalPath = trajetPrincipal(nbAccessibles);
 		construireTrajet(criticalPath, nbAccessibles);
+		if(Math.random()<(double)0.5) {
+			genererPassageSecret();
+		}	
+		
+		for(int i=0; i<pieces.length;i++) {
+			for(int j=0; j<pieces[0].length; j++) {
+				pieces[i][j].visitee=false;
+			}
+		}
+		pieces[spawn_y][spawn_x].visitee=true;
+		int Nbmonstre = 3;//compterPieces()/3;
+		for(int i =0;i<Nbmonstre;i++) {
+			Monstre monstre = new Monstre();
+			int spawn_xx;
+			int spawn_yy;
+			do{
+				spawn_xx = (int)(Math.random()*pieces[0].length);
+				spawn_yy = (int)(Math.random()*pieces.length);
+			}while((spawn_xx==tresor_x && spawn_yy==tresor_y) || (spawn_xx==spawn_x && spawn_yy==spawn_y) || !pieces[spawn_yy][spawn_xx].accessible || pieces[spawn_xx][spawn_yy].pnj!=null);
+			monstre.x=spawn_xx;
+			monstre.y=spawn_yy;
+			pieces[spawn_yy][spawn_xx].pnj=monstre;
+		}
+	}
+	
+	public static void genererPassageSecret() {
+		int x1, y1, x2, y2;
+		do{
+			x1 = (int)(Math.random()*pieces[0].length);
+			y1 = (int)(Math.random()*pieces.length);
+		}while((x1==tresor_x && y1==tresor_y) || !pieces[y1][x1].accessible);
+		
+		do{
+			x2 = (int)(Math.random()*pieces[0].length);
+			y2 = (int)(Math.random()*pieces.length);
+		}while((x2==tresor_x && y2==tresor_y) || (x1==x2 && y1==y2) || !pieces[y2][x2].accessible);
+		
+		p1 = new PieceS(x1,y1);
+		p2 = new PieceS(x2,y2);
+		p1.dest = p2;
+		p2.dest = p1;
+		pieces[y1][x1] = p1;
+		pieces[y2][x2] = p2;
 	}
 	
 	public static void construireTrajet(String criticalPath, int nbAccessibles) {
@@ -224,20 +270,13 @@ public class Scenario
 	
 	public static void jeu() {
 		Affichage.console();
-		Scanner sc = new Scanner(System.in);
-		char dir = sc.next().charAt(0);
-		joueur.deplacer(dir);
-		if(fin()) {
-			//Affichage.effacerConsole();
-			System.out.println("Gagné !");
-			sc.next();
-		}
-		else {
-			jeu();
+		Affichage.update();
+		if(victoire()) {
+			Affichage.victoire();
 		}
 	}
 	
-	public static boolean fin() {
+	public static boolean victoire() {
 		return joueur.x==tresor_x && joueur.y==tresor_y;
 	}
 	

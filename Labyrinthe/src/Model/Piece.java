@@ -1,6 +1,9 @@
 package Model;
 import Controller.*;
 import View.*;
+import java.util.HashSet;
+import java.util.Set;
+
 
 /**
  * <!-- begin-user-doc -->
@@ -8,7 +11,7 @@ import View.*;
  * @generated
  */
 
-public abstract class Combattant extends Personnage
+public class Piece
 {
 	/**
 	 * <!-- begin-user-doc -->
@@ -17,7 +20,10 @@ public abstract class Combattant extends Personnage
 	 * @ordered
 	 */
 	
-	public int Pdv;
+	public boolean accessible;
+	public boolean visitee;
+	
+	public Objet objet;
 
 	/**
 	 * <!-- begin-user-doc -->
@@ -26,15 +32,27 @@ public abstract class Combattant extends Personnage
 	 * @ordered
 	 */
 	
-	public int Force;
+	public Personnage pnj;
+	
+	public Joueur joueur;
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!--  end-user-doc  -->
+	 * @generated
+	 * @ordered
+	 */
+	
+	public Scenario scenario;
 
 	/**
 	 * <!-- begin-user-doc -->
 	 * <!--  end-user-doc  -->
 	 * @generated
 	 */
-	public Combattant(){
-		super();
+	public Piece(){
+		accessible = false;
+		visitee = false;
 	}
 
 }

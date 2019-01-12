@@ -8,7 +8,7 @@ import View.*;
  * @generated
  */
 
-public class Monstre extends Combattant
+public class Monstre extends Pnj
 {
 	/**
 	 * <!-- begin-user-doc -->

@@ -8,7 +8,7 @@ import View.*;
  * @generated
  */
 
-public class Cuisinier extends Personnage
+public class Cuisinier extends Pnj
 {
 	/**
 	 * <!-- begin-user-doc -->
