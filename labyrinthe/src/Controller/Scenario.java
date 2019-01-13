@@ -80,19 +80,22 @@ public class Scenario
 			}
 		}
 		pieces[spawn_y][spawn_x].visitee=true;
-		int Nbmonstre = 3;//compterPieces()/3;
+		int Nbmonstre = compterPieces()/3;
 		for(int i =0;i<Nbmonstre;i++) {
 			Monstre monstre = new Monstre();
 			int spawn_xx;
 			int spawn_yy;
 			do{
-				spawn_xx = (int)(Math.random()*pieces[0].length);
-				spawn_yy = (int)(Math.random()*pieces.length);
-			}while((spawn_xx==tresor_x && spawn_yy==tresor_y) || (spawn_xx==spawn_x && spawn_yy==spawn_y) || !pieces[spawn_yy][spawn_xx].accessible || pieces[spawn_xx][spawn_yy].pnj!=null);
+				spawn_xx = (int)(Math.random()*(pieces[0].length));
+				spawn_yy = (int)(Math.random()*(pieces.length));
+			}while((spawn_xx==tresor_x && spawn_yy==tresor_y) || (spawn_xx==spawn_x && spawn_yy==spawn_y) || !pieces[spawn_yy][spawn_xx].accessible || pieces[spawn_yy][spawn_xx].pnj!=null);
 			monstre.x=spawn_xx;
 			monstre.y=spawn_yy;
 			pieces[spawn_yy][spawn_xx].pnj=monstre;
 		}
+		
+		joueur.Pdv=10;
+		joueur.Energie=10;
 	}
 	
 	public static void genererPassageSecret() {
@@ -174,10 +177,9 @@ public class Scenario
 					x++;
 					cloisonsV[y][x] = new Porte();
 				}
-				pieces[y][x].accessible=true;				
+				pieces[y][x].accessible=true;
 			}
-		}
-		
+		}		
 	}
 	
 	public static int compterPieces() {
@@ -274,10 +276,24 @@ public class Scenario
 		if(victoire()) {
 			Affichage.victoire();
 		}
+		else if(defaite()) {
+			Affichage.defaite();
+		}
 	}
 	
 	public static boolean victoire() {
-		return joueur.x==tresor_x && joueur.y==tresor_y;
+		for(int i=0; i<joueur.objets.size(); i++) {
+			if(joueur.objets.get(i)!=null) {
+				if(joueur.objets.get(i).getClass().getSimpleName().equals("Tresor")) {
+					return true;
+				}
+			}
+		}
+		return false;
+	}
+	
+	public static boolean defaite() {
+		return joueur.Energie==0 || joueur.Pdv==0;
 	}
 	
 	public static void main(String[] args) {

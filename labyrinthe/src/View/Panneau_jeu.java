@@ -48,21 +48,12 @@ public class Panneau_jeu extends JPanel {
 							g.drawString("P", (j*w/10)+10, (i*h/7)+70);
 						}
 						if(Scenario.pieces[i][j].pnj!=null) {
-							//if(Scenario.pieces[i][j].pnj.getClass().getSimpleName().equals("Monstre")) {
-								g.drawString("M", (j*w/10)+60, (i*h/7)+20);
-							//}
+							char c = Scenario.pieces[i][j].pnj.getClass().getSimpleName().charAt(0);
+							g.drawString(String.valueOf(c), (j*w/10)+60, (i*h/7)+20);							
 						}						
 					}
 				}
 			}
 		}
-	}
-	
-	public void victoire(Graphics g) {
-		setFocusable(false);
-		g.clearRect(0, 0, getWidth(), getHeight());
-		g.setColor(Color.yellow);
-		g.drawString("Victoire !", getWidth()/2, getHeight()/2);
-		System.out.println("Victoire !");		
 	}
 }
