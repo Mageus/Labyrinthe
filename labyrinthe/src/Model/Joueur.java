@@ -3,13 +3,6 @@ import Controller.*;
 import View.*;
 import java.util.*;
 
-
-/**
- * <!-- begin-user-doc -->
- * <!--  end-user-doc  -->
- * @generated
- */
-
 public class Joueur extends Personnage
 {
 	public int Pdv;
@@ -25,13 +18,6 @@ public class Joueur extends Personnage
 		super();
 		objets = new ArrayList<Objet>();
 	}
-
-	/**
-	 * <!-- begin-user-doc -->
-	 * <!--  end-user-doc  -->
-	 * @generated
-	 * @ordered
-	 */
 	
 	public void deplacer(char dir) {
 		int x = this.x;

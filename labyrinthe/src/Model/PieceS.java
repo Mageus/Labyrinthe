@@ -3,12 +3,6 @@ import Controller.*;
 import View.*;
 
 
-/**
- * <!-- begin-user-doc -->
- * <!--  end-user-doc  -->
- * @generated
- */
-
 public class PieceS extends Piece
 {
 	
@@ -18,11 +12,6 @@ public class PieceS extends Piece
 	public int x;
 	public int y;
 
-	/**
-	 * <!-- begin-user-doc -->
-	 * <!--  end-user-doc  -->
-	 * @generated
-	 */
 	public PieceS(int x, int y){
 		super();
 		accessible = true;

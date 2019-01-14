@@ -8,20 +8,9 @@ import java.net.URL;
 import java.io.File;
 
 
-/**
- * <!-- begin-user-doc -->
- * <!--  end-user-doc  -->
- * @generated
- */
-
 public class Scenario
 {
-	/**
-	 * <!-- begin-user-doc -->
-	 * <!--  end-user-doc  -->
-	 * @generated
-	 * @ordered
-	 */
+	
 	public static int spawn_x;
 	public static int spawn_y;
 	public static int tresor_x;
@@ -38,13 +27,7 @@ public class Scenario
 	public static Cloison[][] cloisonsH;		//Cloison[Ordonnée][Abscisse] -> cloisons verticales
 
 	public static Joueur joueur;
-
-	/**
-	 * <!-- begin-user-doc -->
-	 * <!--  end-user-doc  -->
-	 * @generated
-	 * @ordered
-	 */
+	
 	
 	public static void init() {
 		Affichage.fini=false;
@@ -358,7 +341,7 @@ public class Scenario
 	
 	
 	public static void jeu() {
-		Affichage.console();
+		//Affichage.console();
 		Affichage.update();
 		if(victoire()) {
 			Affichage.victoire();
