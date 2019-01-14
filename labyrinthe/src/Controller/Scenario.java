@@ -11,14 +11,14 @@ import java.io.File;
 public class Scenario
 {
 	
-	public static int spawn_x;
+	public static int spawn_x;		//Coordonnées du point de départ du joueur
 	public static int spawn_y;
-	public static int tresor_x;
+	public static int tresor_x;		//Coordonnées du trésor
 	public static int tresor_y;
 	
 	public static boolean porte_fermee; 	//Si le trésor est derrière une porte fermée ou non
 	
-	public static PieceS p1;
+	public static PieceS p1;	//Les deux pièces qui seront reliées par un passage secret
 	public static PieceS p2;
 	
 	public static Piece[][] pieces;			//Piece[Ordonnée][Abscisse]
@@ -28,7 +28,7 @@ public class Scenario
 
 	public static Joueur joueur;
 	
-	
+	//Initialisation du jeu
 	public static void init() {
 		Affichage.fini=false;
 		Affichage.first_turn=true;
@@ -36,7 +36,7 @@ public class Scenario
 		cloisonsV = new Cloison[7][11];
 		cloisonsH = new Cloison[8][10];
 		
-		porte_fermee = (Math.random()>0.5);
+		porte_fermee = (Math.random()>0.5);		//1/2 chance que le labyrinthe contienne une clef et une porte fermée
 		
 		for(int i=0; i<pieces.length;i++) {
 			for(int j=0; j<pieces[0].length; j++) {
@@ -44,11 +44,13 @@ public class Scenario
 			}
 		}
 		
+		//Placement du trésor
 		Tresor tresor = new Tresor();
 		tresor_x = (int)(Math.random()*pieces[0].length);
 		tresor_y = (int)(Math.random()*pieces.length);
 		pieces[tresor_y][tresor_x].objet=tresor;
 		
+		//Placement du trésor à une distance d'au moins 5 déplacements du trésor
 		joueur = new Joueur();
 		do{
 			spawn_x = (int)(Math.random()*pieces[0].length);
@@ -59,14 +61,15 @@ public class Scenario
 		pieces[spawn_y][spawn_x].joueur=joueur;
 		
 		int distance = distanceTrajetCourt(spawn_x, spawn_y, tresor_x, tresor_y);
-		int nbAccessibles = distance*2;
+		int nbAccessibles = distance*2;		//Deux fois plus de pièces dans le labyrinthe que la distance joueur-trésor
 		
 		String criticalPath = trajetPrincipal(nbAccessibles);
 		construireTrajet(criticalPath, nbAccessibles);
-		if(Math.random()<(double)0.5) {
+		if(Math.random()<(double)0.5) {		//1/2 chance que le labyrinthe contienne un passage secret
 			genererPassageSecret();
 		}	
 		
+		//Aucune des pièces, à part celle de départ, n'a été visitée
 		for(int i=0; i<pieces.length;i++) {
 			for(int j=0; j<pieces[0].length; j++) {
 				pieces[i][j].visitee=false;
@@ -74,7 +77,8 @@ public class Scenario
 		}
 		pieces[spawn_y][spawn_x].visitee=true;
 		
-		int Nbmonstre = compterPieces()/3;
+		//Placement aléatoire des monstres, ni sur la pièce de départ, ni sur celle du trésor, un seul pnj par salle
+		int Nbmonstre = compterPieces()/3;		//3 fois moins d'ennemis que de pièces
 		for(int i =0;i<Nbmonstre;i++) {
 			Monstre monstre = new Monstre();
 			int spawn_xx;
@@ -88,18 +92,19 @@ public class Scenario
 			pieces[spawn_yy][spawn_xx].pnj=monstre;
 		}
 		
+		//Placement aléatoire des objets Medicament / Nourriture, un seul objet par salle
 		Medicament medicament = new Medicament();
 		int medicament_x = 0;
 		int medicament_y = 0;
 		Nourriture nourriture = new Nourriture();
 		int nourriture_x = 0;
 		int nourriture_y = 0;
-		int NbObjet = compterPieces()/3;
+		int NbObjet = compterPieces()/3;	//3 fois moins d'objets que de pièces
 		
 		for(int i =0;i<NbObjet;i++) {
 			double alea = Math.random();
 			
-			if(alea < 0.5) {
+			if(alea < 0.5) {	//1/2 chance que l'objet généré soit un Medicament, sinon Nourriture 
 				do{
 				medicament_x = (int)(Math.random()*pieces[0].length);
 				medicament_y = (int)(Math.random()*pieces.length);
@@ -118,7 +123,7 @@ public class Scenario
 		
 		}
 		
-		if(Math.random()>0.5) {
+		if(Math.random()>0.5) {		//1/2 chance que le labyrinthe contienne un Medecin, placé aléatoirement comme les monstres
 			Medecin medecin = new Medecin();
 			int spawn_medecin_x;
 			int spawn_medecin_y;
@@ -131,7 +136,7 @@ public class Scenario
 			pieces[spawn_medecin_y][spawn_medecin_x].pnj=medecin;
 		}
 		
-		if(Math.random()>0.5) {
+		if(Math.random()>0.5) {		//1/2 chance que le labyrinthe contienne un Cuisinier, placé aléatoirement comme les monstres / le Medecin
 			Cuisinier cuisinier = new Cuisinier();
 			int spawn_cuisinier_x;
 			int spawn_cuisinier_y;
@@ -144,32 +149,35 @@ public class Scenario
 			pieces[spawn_cuisinier_y][spawn_cuisinier_x].pnj=cuisinier;
 		}
 		
+		//Initialisation des points de vie / de l'énergie du joueur à 10
 		joueur.Pdv=10;
 		joueur.Energie=10;
 	}
 	
+	//Placement des salles contenant un passage secret
 	public static void genererPassageSecret() {
 		int x1, y1, x2, y2;
-		do{
+		do{		//Choix de la première salle, pas celle du trésor
 			x1 = (int)(Math.random()*pieces[0].length);
 			y1 = (int)(Math.random()*pieces.length);
 		}while((x1==tresor_x && y1==tresor_y) || !pieces[y1][x1].accessible);
 		
-		do{
+		do{		//Choix de la seconde salle, pas celle du trésor ni de la première contenant un passage secret
 			x2 = (int)(Math.random()*pieces[0].length);
 			y2 = (int)(Math.random()*pieces.length);
 		}while((x2==tresor_x && y2==tresor_y) || (x1==x2 && y1==y2) || !pieces[y2][x2].accessible);
 		
 		p1 = new PieceS(x1,y1);
 		p2 = new PieceS(x2,y2);
-		p1.dest = p2;
+		p1.dest = p2;	//Liaison des deux pièces
 		p2.dest = p1;
 		pieces[y1][x1] = p1;
 		pieces[y2][x2] = p2;
 	}
 	
+	//Construction des trajets possibles dans le labyrinthe : placement des portes sur ces trajets
 	public static void construireTrajet(String criticalPath, int nbAccessibles) {
-		//Initialisation des murs
+		//Initialisation des murs (murs partout au départ)
 		for(int i=0; i<cloisonsH.length;i++) {
 			for(int j=0; j<cloisonsH[0].length;j++) {
 				cloisonsH[i][j] = new Mur();
@@ -181,51 +189,39 @@ public class Scenario
 			}
 		}
 		
-		//Construction du trajer principal (criticalPath)
+		//Construction du trajet principal (criticalPath, du joueur au trésor), placement des portes sur ce trajet
 		pieces[spawn_y][spawn_x].accessible=true;
 		pieces[tresor_y][tresor_x].accessible=true;
 		int distance_cle = (int)(Math.random()*criticalPath.length());
 		int x = spawn_x, y = spawn_y;
 		for(int i=0; i<criticalPath.length(); i++) {
-			if(i==distance_cle && porte_fermee) {
+			Porte porte = new Porte();
+			if(i==criticalPath.length()-1  && porte_fermee) {		//La dernière pièce (i.e. celle contenant le trésor) sera derrière une porte fermée
+				porte.locked=true;
+			}
+			if(i==distance_cle && porte_fermee) {		//Placement de la clé à un endroit aléatoire sur ce trajet
 				pieces[y][x].objet = new Clef(); 
 			}
 			if(criticalPath.charAt(i)=='h' && y!=0) {
-				Porte porte = new Porte();
-				if(i==criticalPath.length()-1 && porte_fermee) {
-					porte.locked=true;
-				}
 				cloisonsH[y][x]=porte;
 				y--;
 			}
 			else if(criticalPath.charAt(i)=='b' && y!=pieces.length-1) {
 				y++;
-				Porte porte = new Porte();
-				if(i==criticalPath.length()-1  && porte_fermee) {
-					porte.locked=true;
-				}
 				cloisonsH[y][x]=porte;
 			}
 			else if(criticalPath.charAt(i)=='g' && x!=0) {
-				Porte porte = new Porte();
-				if(i==criticalPath.length()-1  && porte_fermee) {
-					porte.locked=true;
-				}
 				cloisonsV[y][x]=porte;
 				x--;
 			}
 			else if(criticalPath.charAt(i)=='d' && x!=pieces[0].length-1) {
 				x++;
-				Porte porte = new Porte();
-				if(i==criticalPath.length()-1  && porte_fermee) {
-					porte.locked=true;
-				}
 				cloisonsV[y][x]=porte;
 			}
 			pieces[y][x].accessible=true;
 		}
 		
-		//Construction salles supplémentaires
+		//Construction des salles supplémentaires placées aléatoirement autour du trajet principal
 		while(compterPieces()!=nbAccessibles) {
 			int dirAlea = (int)(Math.random()*4);
 			x = (int)(Math.random()*pieces[0].length);
@@ -252,6 +248,7 @@ public class Scenario
 		}		
 	}
 	
+	//Renvoie le nombre de pièces accessibles du labyrinthe
 	public static int compterPieces() {
 		int n=0;
 		for(int i=0; i<pieces.length; i++) {
@@ -264,6 +261,7 @@ public class Scenario
 		return n;
 	}
 	
+	//Renvoie le nombre de déplacement minimal pour aller de la case (x1,y1) à la case (x2,y2)
 	public static int distanceTrajetCourt(int x1, int y1, int x2, int y2) {
 		int n=0;
 		while(x1!=x2 || y1!=y2) {
@@ -284,7 +282,9 @@ public class Scenario
 		return n;
 	}
 	
+	//Détermine un trajet aléatoire du joueur au trésor
 	public static String trajetPrincipal(int max) {
+		//Toutes les cloisons, sauf les extrémités, sont des portes afin de pouvoir s'y déplacer pour déterminer le trajet principal
 		for(int i=0; i<cloisonsH.length;i++) {
 			for(int j=0; j<cloisonsH[0].length;j++) {
 				if(i<cloisonsH.length-1 && i>0 && j<cloisonsH[0].length-1 && j>0) {
@@ -307,12 +307,12 @@ public class Scenario
 		}
 		String resu = new String();
 		do{
-			resu="";
+			resu="";		//Contiendra le trajet principal sous forme de String (un caractère pour chaque direction empruntée)
 			pieces[joueur.y][joueur.x].joueur=null;
 			joueur.x=spawn_x;
 			joueur.y=spawn_y;
 			pieces[spawn_y][spawn_x].joueur=joueur;
-			while(resu.length()<max && (joueur.x!=tresor_x || joueur.y!=tresor_y)) {
+			while(resu.length()<max && (joueur.x!=tresor_x || joueur.y!=tresor_y)) {		//Choisir une nouvelle direction aléatoire jusqu'à arriver au trésor, recommence s'il dépasse le max de pièces du labyrinthe
 				int dir = (int)(Math.random()*4);
 				if(dir==0) {
 					joueur.deplacer('h');
@@ -332,18 +332,18 @@ public class Scenario
 				}
 			}
 		}while(joueur.x!=tresor_x || joueur.y!=tresor_y);
-		pieces[joueur.y][joueur.x].joueur=null;
+		pieces[joueur.y][joueur.x].joueur=null;		//On replace le joueur à son point de départ
 		joueur.x=spawn_x;
 		joueur.y=spawn_y;
 		pieces[spawn_y][spawn_x].joueur=joueur;
 		return resu;
 	}
 	
-	
+	//Boucle principale de jeu
 	public static void jeu() {
 		//Affichage.console();
-		Affichage.update();
-		if(victoire()) {
+		Affichage.update();		//Met à jour l'affichage du jeu
+		if(victoire()) {		//En cas de victoire, on affiche l'écran de victoire et on joue un son
 			Affichage.victoire();
 			URL url = null;
 			try {
@@ -355,7 +355,7 @@ public class Scenario
 			AudioClip clip = Applet.newAudioClip(url);
 			clip.play();
 		}
-		else if(defaite()) {
+		else if(defaite()) {	//En cas de défaite, on affiche l'écran de défaite et on joue un son
 			Affichage.defaite();
 			URL url = null;
 			try {
@@ -369,6 +369,7 @@ public class Scenario
 		}
 	}
 	
+	//Vérifie si le joueur a gagné, i.e. s'il a ramassé le trésor
 	public static boolean victoire() {
 		for(int i=0; i<joueur.objets.size(); i++) {
 			if(joueur.objets.get(i)!=null) {
@@ -380,6 +381,7 @@ public class Scenario
 		return false;
 	}
 	
+	//Vérifie si le joueur a perdu, i.e. son énergie ou ses points de vie sont tombés à 0
 	public static boolean defaite() {
 		return joueur.Energie==0 || joueur.Pdv==0;
 	}

@@ -6,22 +6,23 @@ import java.awt.*;
 
 public class Affichage
 {	
-	public static JFrame jf_jeu;
-	public static JFrame jf_inv;
-	public static JFrame jf_combat;
+	public static JFrame jf_jeu;		//Fenêtre principale de l'affichage du jeu (labyrinthe)
+	public static JFrame jf_inv;		//Fenêtre de l'affichage de l'inventaire
+	public static JFrame jf_combat;		//Fenêtre de l'affichage des combats
 	
-	public static Panneau_jeu p_jeu;
-	public static JPanel p_inv;
-	public static JPanel p_combat;
+	public static Panneau_jeu p_jeu;	//Panneau d'affichage du jeu
+	public static JPanel p_inv;			//Panneau d'affichage de l'inventaire
+	public static JPanel p_combat;		//Panneau d'affichage des combats
 	
-	public static boolean fini=false;
+	public static boolean fini=false;	//True si la partie est terminée
 	
-	public static boolean combat_en_cours=false;
-	public static boolean first_turn=true;
-	public static int gagne_combat;		//0 : égalité - 1 : victoire joueur - 2 : victoire monstre
-	public static String last_move_j;
-	public static String last_move_m;
+	public static boolean combat_en_cours=false;	//True si un combat est en cours
+	public static boolean first_turn=true;		//True pour le premier tour d'un combat
+	public static int gagne_combat;		//issue d'une manche de combat, 0 : égalité - 1 : victoire joueur - 2 : victoire monstre
+	public static String last_move_j;	//Dernier coup joué lors du combat par le joueur
+	public static String last_move_m;	//Dernier coup joué lors du combat par le monstre
 	
+	//Methode obsolète, affichage console
 	public static void console() {
 		effacerConsole();
 		for(int i=0; i<Scenario.cloisonsH.length; i++) {
@@ -62,6 +63,7 @@ public class Affichage
 		}
 	}
 	
+	//Méthode obsolète, effacer la console
 	public static void effacerConsole() {
 		try {
 			if(System.getProperty("os.name").startsWith("Windows")) {
@@ -77,10 +79,15 @@ public class Affichage
 		}
 	}
 	
+	//Affiche la fenêtre de victoire
 	public static void victoire() {
-		if(!fini) {
-			fini=true;
-			p_jeu.setFocusable(false);
+		if(!fini) {		//Ne l'affiche qu'une seule fois, lorsque la partie n'est pas encore considérée comme finie
+			fini=true;	//La partie est finie.
+			jf_jeu.setEnabled(false);	//On désactive les autres fenêtres du jeu
+			jf_inv.setEnabled(false);
+			if(combat_en_cours) {
+				jf_combat.setEnabled(false);
+			}
 			JFrame jf = new JFrame("Victoire");
 			jf.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 			jf.setSize(350, 100);
@@ -90,40 +97,9 @@ public class Affichage
 			GridBagConstraints c = new GridBagConstraints();
 			jf.setContentPane(p);
 			Label l = new Label("Félicitations ! Vous avez trouvé le trésor !");
-			JButton reset = new JButton("Nouvelle partie");
+			JButton reset = new JButton("Nouvelle partie");		//Bouton pour recommencer une partie
 			reset.addActionListener(new ButtonListener("reset"));
-			JButton quitter = new JButton("Quitter");
-			quitter.addActionListener(new ButtonListener("exit"));
-			c.gridwidth = 3;
-			c.gridx = 0;
-			c.gridy = 0;
-			p.add(l,c);
-			c.gridwidth=1;
-			c.gridy = 1;
-			p.add(reset,c);
-			c.gridx = 2;
-			p.add(quitter,c);
-			jf.setLocationRelativeTo(null);
-			jf.setVisible(true);;
-		}
-	}
-	
-	public static void defaite() {
-		if(!fini) {
-			fini=true;
-			p_jeu.setFocusable(false);
-			JFrame jf = new JFrame("Défaite");
-			jf.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-			jf.setSize(350, 100);
-			jf.setResizable(false);
-			JPanel p = new JPanel();
-			p.setLayout(new GridBagLayout());
-			GridBagConstraints c = new GridBagConstraints();
-			jf.setContentPane(p);
-			Label l = new Label("Dommage ! Le labyrinthe a eu raison de vous.");
-			JButton reset = new JButton("Nouvelle partie");
-			reset.addActionListener(new ButtonListener("reset"));
-			JButton quitter = new JButton("Quitter");
+			JButton quitter = new JButton("Quitter");			//Bouton pour quitter le jeu
 			quitter.addActionListener(new ButtonListener("exit"));
 			c.gridwidth = 3;
 			c.gridx = 0;
@@ -139,6 +115,43 @@ public class Affichage
 		}
 	}
 	
+	//Affiche la fenêtre de défaitre
+	public static void defaite() {
+		if(!fini) {		//Ne l'affiche qu'une seule fois, lorsque la partie n'est pas encore considérée comme finie
+			fini=true;	//La partie est finie.
+			jf_jeu.setEnabled(false);	//On désactive les autres fenêtres du jeu
+			jf_inv.setEnabled(false);
+			if(combat_en_cours) {
+				jf_combat.setEnabled(false);
+			}
+			JFrame jf = new JFrame("Défaite");
+			jf.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+			jf.setSize(350, 100);
+			jf.setResizable(false);
+			JPanel p = new JPanel();
+			p.setLayout(new GridBagLayout());
+			GridBagConstraints c = new GridBagConstraints();
+			jf.setContentPane(p);
+			Label l = new Label("Dommage ! Le labyrinthe a eu raison de vous.");
+			JButton reset = new JButton("Nouvelle partie");		//Bouton pour recommencer une partie
+			reset.addActionListener(new ButtonListener("reset"));
+			JButton quitter = new JButton("Quitter");			//Bouton pour quitter le jeu
+			quitter.addActionListener(new ButtonListener("exit"));
+			c.gridwidth = 3;
+			c.gridx = 0;
+			c.gridy = 0;
+			p.add(l,c);
+			c.gridwidth=1;
+			c.gridy = 1;
+			p.add(reset,c);
+			c.gridx = 2;
+			p.add(quitter,c);
+			jf.setLocationRelativeTo(null);
+			jf.setVisible(true);
+		}
+	}
+	
+	//Affichage de la fenêtre principale du jeu (le labyrinthe)
 	public static void fenetre_jeu() {
 		jf_jeu = new JFrame("Labyrinthe");
 		jf_jeu.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -146,7 +159,7 @@ public class Affichage
 		jf_jeu.setSize(d);
 		jf_jeu.setResizable(false);
 		
-		p_jeu = new Panneau_jeu();
+		p_jeu = new Panneau_jeu();		//Définition du JPanel qui affichera le labyrinthe, voir Panneau_jeu pour plus d'informations
 		p_jeu.setPreferredSize(d);
 		
 		jf_jeu.setContentPane(p_jeu);
@@ -159,6 +172,7 @@ public class Affichage
 		jf_jeu.setVisible(true);
 	}
 	
+	//Affichage de la fenêtre d'inventaire
 	public static void fenetre_inv() {
 		jf_inv = new JFrame("Inventaire");
 		jf_inv.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -171,12 +185,13 @@ public class Affichage
 		jf_inv.setVisible(true);	
 	}
 	
+	//Mise à jour de la fenêtre d'inventaire
 	public static void update_inv() {
 		p_inv = new JPanel();
 		
-		JPanel stats = new JPanel();
-		JPanel objets = new JPanel();
-		JPanel actions = new JPanel();
+		JPanel stats = new JPanel();		//Panneau des statistiques (Pdv/Energie)
+		JPanel objets = new JPanel();		//Panneau des objets contenus dans l'inventaire du joueur
+		JPanel actions = new JPanel();		//Panneau des actions effectuables par le joueur (Ramasser un objet / Emprunter un passage secret)
 		
 		stats.setLayout(new BorderLayout());
 		JLabel pdv = new JLabel();
@@ -239,8 +254,9 @@ public class Affichage
 		
 	}
 	
+	//Affichage de la fenêtre de combat
 	public static void combat() {
-		jf_jeu.setEnabled(false);
+		jf_jeu.setEnabled(false);		//On désactive les fenêtres de jeu et d'inventaire: la fenêtre de combat sera donc au premier plan
 		jf_inv.setEnabled(false);
 		combat_en_cours = true;
 		jf_combat = new JFrame("Combat");
@@ -255,12 +271,14 @@ public class Affichage
 		jf_combat.setVisible(true);
 	}
 	
+	//Mise à jour de la fenêtre de combat
 	public static void update_combat() {
 		p_combat = new JPanel();
 		p_combat.setLayout(new GridBagLayout());
 		GridBagConstraints c = new GridBagConstraints();
 		c.gridy=0;
 		
+		//Boutons des coups possibles
 		JButton b_pierre = new JButton("Pierre");
 		b_pierre.addActionListener(new ButtonListener("pierre"));
 		JButton b_feuille = new JButton("Feuille");
@@ -275,7 +293,7 @@ public class Affichage
 		c.gridx=2;
 		p_combat.add(b_ciseaux,c);
 		
-		if(!first_turn) {
+		if(!first_turn) {		//Affiche les derniers coups effectués à partir du 2e tour
 			c.fill = GridBagConstraints.HORIZONTAL;
 			c.gridwidth=3;
 			c.gridx=0;
@@ -287,7 +305,7 @@ public class Affichage
 			p_combat.add(m_move,c);
 			JLabel resu = new JLabel();
 			c.gridy=3;
-			if(gagne_combat==1) {
+			if(gagne_combat==1) {		//Victoire du joueur
 				b_pierre.setEnabled(false);
 				b_feuille.setEnabled(false);
 				b_ciseaux.setEnabled(false);
@@ -300,12 +318,12 @@ public class Affichage
 				c.gridy=4;
 				p_combat.add(close,c);
 			}
-			else if(gagne_combat==2) {
+			else if(gagne_combat==2) {	//Victoire du monstre : le joueur perd un pv (voir Joueur.tour_combat)
 				resu.setText("Vous perdez 1 point de vie.");
 				p_combat.add(resu,c);
 			}
 		}
-		if(gagne_combat!=1) {
+		if(gagne_combat!=1) {		//Bouton "Fuir" disponible tant que le joueur n'a pas gagné le combat
 			c.fill = GridBagConstraints.HORIZONTAL;
 			c.gridwidth=3;
 			c.gridx=0;
@@ -318,17 +336,18 @@ public class Affichage
 		jf_combat.setContentPane(p_combat);
 	}
 	
+	//Mise à jour de l'affichage du jeu
 	public static void update() {
-		if(jf_jeu==null && jf_inv==null) {
+		if(jf_jeu==null && jf_inv==null) {	//Si les fenêtres principales ne sont pas disponibles (si le jeu vient de commencer), les créer
 			fenetre_jeu();
 			fenetre_inv();
 		}
-		else {			
+		else {		//Sinon, on met à jour les fenêtre principales
 			p_jeu.repaint();
 			update_inv();
 			jf_inv.validate();
 		}
-		if(!combat_en_cours) {
+		if(!combat_en_cours) {	//S'il n'y a pas de combat en cours, la fenêtre au premier plan est toujours celle qui affiche le labyrinthe
 			p_jeu.requestFocus();
 		}
 	}

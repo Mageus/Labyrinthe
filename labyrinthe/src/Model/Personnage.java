@@ -6,7 +6,7 @@ import View.*;
 public abstract class Personnage
 {
 
-	public int x;
+	public int x;		//Coordonnées du personnage
 	public int y;
 
 	public Personnage(){
