@@ -49,6 +49,11 @@ public class ButtonListener implements ActionListener {
 			Scenario.jeu();
 		}
 		else if(action.equals("fuir")) {
+			Affichage.jf_combat.dispose();
+			Affichage.jf_jeu.setEnabled(true);
+			Affichage.jf_inv.setEnabled(true);
+			Affichage.p_inv.requestFocus();
+			Affichage.p_jeu.requestFocus();
 			Scenario.joueur.fuir();
 			Scenario.jeu();
 		}
@@ -64,6 +69,10 @@ public class ButtonListener implements ActionListener {
 		else if(action.equals("close")) {
 			Affichage.combat_en_cours=false;
 			Affichage.jf_combat.dispose();
+			Affichage.jf_jeu.setEnabled(true);
+			Affichage.jf_inv.setEnabled(true);
+			Affichage.p_inv.requestFocus();
+			Affichage.p_jeu.requestFocus();
 			Affichage.first_turn=true;
 			Affichage.gagne_combat=0;
 		}

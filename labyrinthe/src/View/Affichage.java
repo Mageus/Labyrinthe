@@ -240,6 +240,8 @@ public class Affichage
 	}
 	
 	public static void combat() {
+		jf_jeu.setEnabled(false);
+		jf_inv.setEnabled(false);
 		combat_en_cours = true;
 		jf_combat = new JFrame("Combat");
 		jf_combat.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);

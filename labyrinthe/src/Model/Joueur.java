@@ -185,7 +185,6 @@ public class Joueur extends Personnage
 	}
 	
 	public void fuir() {
-		Affichage.jf_combat.dispose();
 		switch(last_move) {
 		case 'h' : deplacer('b');
 				   break;
@@ -196,6 +195,7 @@ public class Joueur extends Personnage
 		case 'd' : deplacer('g');
 		   		   break;
 		case 'p' : passageSecret();
+				   break;
 		}		
 	}
 
