@@ -10,11 +10,6 @@ import View.*;
 
 public class Mur extends Cloison
 {
-	/**
-	 * <!-- begin-user-doc -->
-	 * <!--  end-user-doc  -->
-	 * @generated
-	 */
 	public Mur(){
 		super();
 	}

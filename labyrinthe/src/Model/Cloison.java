@@ -10,20 +10,9 @@ import View.*;
 
 public abstract class Cloison
 {
-	/**
-	 * <!-- begin-user-doc -->
-	 * <!--  end-user-doc  -->
-	 * @generated
-	 * @ordered
-	 */
+		
+	public boolean locked;
 	
-	public Scenario scenario;
-
-	/**
-	 * <!-- begin-user-doc -->
-	 * <!--  end-user-doc  -->
-	 * @generated
-	 */
 	public Cloison(){
 		super();
 	}

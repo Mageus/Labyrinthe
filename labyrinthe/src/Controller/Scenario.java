@@ -1,7 +1,11 @@
 package Controller;
 import View.*;
 import Model.*;
-import java.util.*;
+
+import java.applet.Applet;
+import java.applet.AudioClip;
+import java.net.URL;
+import java.io.File;
 
 
 /**
@@ -23,6 +27,8 @@ public class Scenario
 	public static int tresor_x;
 	public static int tresor_y;
 	
+	public static boolean porte_fermee; 	//Si le trésor est derrière une porte fermée ou non
+	
 	public static PieceS p1;
 	public static PieceS p2;
 	
@@ -41,9 +47,13 @@ public class Scenario
 	 */
 	
 	public static void init() {
+		Affichage.fini=false;
+		Affichage.first_turn=true;
 		pieces = new Piece[7][10];
 		cloisonsV = new Cloison[7][11];
 		cloisonsH = new Cloison[8][10];
+		
+		porte_fermee = (Math.random()>0.5);
 		
 		for(int i=0; i<pieces.length;i++) {
 			for(int j=0; j<pieces[0].length; j++) {
@@ -80,6 +90,7 @@ public class Scenario
 			}
 		}
 		pieces[spawn_y][spawn_x].visitee=true;
+		
 		int Nbmonstre = compterPieces()/3;
 		for(int i =0;i<Nbmonstre;i++) {
 			Monstre monstre = new Monstre();
@@ -92,6 +103,62 @@ public class Scenario
 			monstre.x=spawn_xx;
 			monstre.y=spawn_yy;
 			pieces[spawn_yy][spawn_xx].pnj=monstre;
+		}
+		
+		Medicament medicament = new Medicament();
+		int medicament_x = 0;
+		int medicament_y = 0;
+		Nourriture nourriture = new Nourriture();
+		int nourriture_x = 0;
+		int nourriture_y = 0;
+		int NbObjet = compterPieces()/3;
+		
+		for(int i =0;i<NbObjet;i++) {
+			double alea = Math.random();
+			
+			if(alea < 0.5) {
+				do{
+				medicament_x = (int)(Math.random()*pieces[0].length);
+				medicament_y = (int)(Math.random()*pieces.length);
+				
+				} while(pieces[medicament_y][medicament_x].objet != null || !pieces[medicament_y][medicament_x].accessible);
+				pieces[medicament_y][medicament_x].objet=medicament;
+			}
+			
+			else {
+				do{
+					nourriture_x = (int)(Math.random()*pieces[0].length);
+					nourriture_y = (int)(Math.random()*pieces.length);
+				} while(pieces[nourriture_y][nourriture_x].objet != null || !pieces[nourriture_y][nourriture_x].accessible);
+				pieces[nourriture_y][nourriture_x].objet=nourriture;
+			}
+		
+		}
+		
+		if(Math.random()>0.5) {
+			Medecin medecin = new Medecin();
+			int spawn_medecin_x;
+			int spawn_medecin_y;
+			do{
+				spawn_medecin_x = (int)(Math.random()*pieces[0].length);
+				spawn_medecin_y = (int)(Math.random()*pieces.length);
+			}while((spawn_medecin_x == tresor_x && spawn_medecin_y==tresor_y) || (spawn_medecin_x==spawn_x && spawn_medecin_y==spawn_y) || pieces[spawn_medecin_y][spawn_medecin_x].accessible == false || pieces[spawn_medecin_y][spawn_medecin_x].pnj!=null);
+			medecin.x=spawn_medecin_x;
+			medecin.y=spawn_medecin_y;
+			pieces[spawn_medecin_y][spawn_medecin_x].pnj=medecin;
+		}
+		
+		if(Math.random()>0.5) {
+			Cuisinier cuisinier = new Cuisinier();
+			int spawn_cuisinier_x;
+			int spawn_cuisinier_y;
+			do{
+				spawn_cuisinier_x = (int)(Math.random()*pieces[0].length);
+				spawn_cuisinier_y = (int)(Math.random()*pieces.length);
+			}while((spawn_cuisinier_x==tresor_x && spawn_cuisinier_y==tresor_y) || (spawn_cuisinier_x==spawn_x && spawn_cuisinier_y==spawn_y) || pieces[spawn_cuisinier_y][spawn_cuisinier_x].accessible == false || pieces[spawn_cuisinier_y][spawn_cuisinier_x].pnj!=null);
+			cuisinier.x=spawn_cuisinier_x;
+			cuisinier.y=spawn_cuisinier_y;
+			pieces[spawn_cuisinier_y][spawn_cuisinier_x].pnj=cuisinier;
 		}
 		
 		joueur.Pdv=10;
@@ -134,23 +201,43 @@ public class Scenario
 		//Construction du trajer principal (criticalPath)
 		pieces[spawn_y][spawn_x].accessible=true;
 		pieces[tresor_y][tresor_x].accessible=true;
+		int distance_cle = (int)(Math.random()*criticalPath.length());
 		int x = spawn_x, y = spawn_y;
 		for(int i=0; i<criticalPath.length(); i++) {
+			if(i==distance_cle && porte_fermee) {
+				pieces[y][x].objet = new Clef(); 
+			}
 			if(criticalPath.charAt(i)=='h' && y!=0) {
-				cloisonsH[y][x] = new Porte();
+				Porte porte = new Porte();
+				if(i==criticalPath.length()-1 && porte_fermee) {
+					porte.locked=true;
+				}
+				cloisonsH[y][x]=porte;
 				y--;
 			}
 			else if(criticalPath.charAt(i)=='b' && y!=pieces.length-1) {
 				y++;
-				cloisonsH[y][x] = new Porte();
+				Porte porte = new Porte();
+				if(i==criticalPath.length()-1  && porte_fermee) {
+					porte.locked=true;
+				}
+				cloisonsH[y][x]=porte;
 			}
 			else if(criticalPath.charAt(i)=='g' && x!=0) {
-				cloisonsV[y][x] = new Porte();
+				Porte porte = new Porte();
+				if(i==criticalPath.length()-1  && porte_fermee) {
+					porte.locked=true;
+				}
+				cloisonsV[y][x]=porte;
 				x--;
 			}
 			else if(criticalPath.charAt(i)=='d' && x!=pieces[0].length-1) {
 				x++;
-				cloisonsV[y][x] = new Porte();
+				Porte porte = new Porte();
+				if(i==criticalPath.length()-1  && porte_fermee) {
+					porte.locked=true;
+				}
+				cloisonsV[y][x]=porte;
 			}
 			pieces[y][x].accessible=true;
 		}
@@ -236,7 +323,7 @@ public class Scenario
 			}
 		}
 		String resu = new String();
-		while(joueur.x!=tresor_x || joueur.y!=tresor_y) {
+		do{
 			resu="";
 			pieces[joueur.y][joueur.x].joueur=null;
 			joueur.x=spawn_x;
@@ -261,7 +348,7 @@ public class Scenario
 					resu=resu+"d";
 				}
 			}
-		}
+		}while(joueur.x!=tresor_x || joueur.y!=tresor_y);
 		pieces[joueur.y][joueur.x].joueur=null;
 		joueur.x=spawn_x;
 		joueur.y=spawn_y;
@@ -275,9 +362,27 @@ public class Scenario
 		Affichage.update();
 		if(victoire()) {
 			Affichage.victoire();
+			URL url = null;
+			try {
+				url = new File("victoire.wav").toURI().toURL();
+			}
+			catch(Exception e) {
+				e.printStackTrace();
+			}
+			AudioClip clip = Applet.newAudioClip(url);
+			clip.play();
 		}
 		else if(defaite()) {
 			Affichage.defaite();
+			URL url = null;
+			try {
+				url = new File("defaite.wav").toURI().toURL();
+			}
+			catch(Exception e) {
+				e.printStackTrace();
+			}
+			AudioClip clip = Applet.newAudioClip(url);
+			clip.play();
 		}
 	}
 	
